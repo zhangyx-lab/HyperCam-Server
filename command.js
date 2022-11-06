@@ -14,7 +14,8 @@ export function LED(index) {
 export function WAIT(time) {
 	if (time < 0)
 		throw new Error(`[WAIT] Time period has to be positive`);
-	return `WAIT ${time}`;
+	let time_ns = Math.round(time * 1000);
+	return `WAIT ${time_ns}`;
 }
 
 export function RST() {

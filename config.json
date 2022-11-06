@@ -1,0 +1,8 @@
+{
+	"driverPath": "/home/Yuxuan/HyperCamDriver/arm64/HyperCamDriver",
+	"controller": {
+		"vendorId": "f055",
+		"productId": "0001"
+	},
+	"port": 80
+}

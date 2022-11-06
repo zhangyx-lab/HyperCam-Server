@@ -2,10 +2,16 @@ import { SerialPort } from 'serialport';
 import { matchDevice } from './device.js';
 import { readFileSync } from 'fs';
 import { COMBINE, LED, WAIT, RST } from './command.js';
+import { resolve } from 'path';
+import { ROOT } from './env.js';
 console.log(`PID = ${process.pid}`)
 const
+	led_index = parseInt(process.argv?.[2] ?? 1),
+	exposure = parseFloat(process.argv?.[3] ?? 1000.0),
 	deviceList = await SerialPort.list(),
-	deviceInfo = JSON.parse(readFileSync('./device.json')),
+	deviceInfo = JSON.parse(
+		readFileSync(resolve(ROOT, 'device.json'))
+	),
 	devicePath = matchDevice(deviceList, deviceInfo),
 	device = new SerialPort({
 		path: devicePath,
@@ -48,16 +54,15 @@ async function write(data) {
 try {
 	await write(
 		COMBINE(
-			LED(7).ON,
-			WAIT(500000),
-			RST(),
-			LED(6).ON,
-			WAIT(500000),
+			LED(led_index).ON,
+			WAIT(exposure),
 			RST()
 		)
 	)
 	await write('$')
-	await new Promise(res => setTimeout(res, 2000));
+	await new Promise(
+		res => setTimeout(res, Math.ceil(exposure) + 500)
+	);
 } catch (e) {
 	console.error(e);
 } finally {
