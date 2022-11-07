@@ -19,4 +19,19 @@ export default class Lockable {
 			if (this.#lock === promise) this.#lock = undefined;
 		};
 	}
+	// Get all locks
+	static async getLocks(...list) {
+		// Check for eligibility
+		const typeErrList = list.filter(el => !(el instanceof Lockable));
+		if (typeErrList.length)
+			throw new Error(`${typeErrList} does not inherit from Lockable`)
+		// Gather all unlock functions
+		const unlockFnList = await Promise.all(
+			list.map(l => l.getLock())
+		)
+		// Return unlock function for all instances
+		return () => {
+			unlockFnList.forEach(unlock => unlock());
+		}
+	}
 }
