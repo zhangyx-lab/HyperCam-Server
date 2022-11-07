@@ -1,14 +1,11 @@
-import { Stream } from 'stream';
-export default class Streamer extends Stream {
+export default class Streamer {
 	// The stream delimiter
 	#delimiter;
 	#ignore;
 	// Class constructor
 	constructor(delimiter = /\n/g, ignore = /\r/g) {
-		super();
 		this.#delimiter = delimiter;
 		this.#ignore = ignore;
-		this.on('data', chunk => this.receive(chunk));
 	}
 	// Line buffer
 	#buffer = '';

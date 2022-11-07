@@ -12,8 +12,8 @@ const
 console.log('====== DEVICE ACTIVE ======');
 await controller
 	.WAIT(0)
-	.LED(1).PWM(64)
-	.WAIT(1000)
+	.LED(2).PWM(1)
+	.WAIT(80)
 	.RST()
 	.commit()
 console.log('====== COMMAND LOADED ======');
