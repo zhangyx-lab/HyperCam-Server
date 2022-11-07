@@ -17,8 +17,11 @@ if (!existsSync(VAR)) {
 	throw new Error(`VAR path ${VAR} has been occupied by a regular file.`);
 }
 // Initialize Device Info
-export const CONTROLLER_VID = USER_CONF?.controller?.vendorId ?? "f055";
-export const CONTROLLER_PID = USER_CONF?.controller?.productId ?? "0001";
+export const CONTROLLER_TARGET =
+	USER_CONF?.controller ?? {
+		vendorId: "f055",
+		productId: "0001"
+	};
 // Initialize Driver Path
 export const DRIVER_PATH = USER_CONF?.driverPath;
 if (typeof DRIVER_PATH !== 'string' || !existsSync(DRIVER_PATH))
