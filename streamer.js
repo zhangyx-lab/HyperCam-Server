@@ -1,16 +1,18 @@
 export default class Streamer {
 	// The stream delimiter
 	#delimiter;
+	#ignore;
 	// Class constructor
-	constructor(delimiter = '\n') {
+	constructor(delimiter = /\n/g, ignore = /\r/g) {
 		this.#delimiter = delimiter;
+		this.#ignore = ignore;
 	}
 	// Line buffer
 	#buffer = '';
 	// Receiver
 	receive(buf) {
 		const
-			str = buf.toString(),
+			str = buf.toString().replace(this.#ignore, ''),
 			blocks = str.split(this.#delimiter);
 		blocks.forEach((blk, i) => {
 			if (i + 1 < blocks.length) {
@@ -18,7 +20,7 @@ export default class Streamer {
 				if (i === 0)
 					this.#processBlock(this.#buffer + blk);
 				else
-					this.#processBlock(str);
+					this.#processBlock(blk);
 			} else {
 				// Push this block to buffer
 				// and wait for next delimiter
@@ -33,7 +35,7 @@ export default class Streamer {
 	#queue = [];
 	// Line Processor
 	#processBlock(blk) {
-		this.#queue = this.#queue.filter(el => !el(blk));
+		this.#queue = this.#queue.filter(f => !f(blk));
 	}
 	// Event registerer
 	waitFor(cond) {
