@@ -34,7 +34,7 @@ const server = express()
 			console.log('Acquisition Start !!!');
 			const {
 				LED = 1,
-				EXP = 80,
+				EXP = 100,
 				DELAY = 0,
 				PWM = 1
 			} = req.query ?? {}
