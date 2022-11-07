@@ -95,40 +95,40 @@ export default class Controller extends Lockable {
 	// Execute committed commands
 	exec() {
 		return Promise.all([
-			this.#send('$'),
 			this.#streamer.waitFor(
 				/^\>\>\s*Execution FINISHED/gi
-			)
+			),
+			this.#send('$')
 		])
 	}
 	// Commit commands to the controller
 	async commit() {
-		await this.#send(
-			this.#cmd
-				.map(el => el.replace(/[\n;]{2,}/gi, ';'))
-				.join(';')
-			+ ';'
-		)
+		for (const cmd of this.#cmd) {
+			await Promise.all([
+				this.#streamer.waitFor(/^\>{2}/gi),
+				this.#send((cmd + ';').replace(/[\n;]{2,}/, ';'))
+			])
+		}
 		this.#cmd = [];
 	}
 	// LED Command Parser
 	LED(index) {
-		const self = this;
+		const self = this, cmd = this.#cmd;
 		if (index < 1 || index > 8)
 			throw new Error(`[LED] Index ${index} out of range`);
 		return {
 			get ON() {
-				this.#cmd.push(`LED ${index} 128`)
+				cmd.push(`LED ${index} 128`)
 				return self
 			},
 			get OFF() {
-				this.#cmd.push(`LED ${index} 0`)
+				cmd.push(`LED ${index} 0`)
 				return self
 			},
 			PWM(val) {
 				if (val < 0 || val > 128)
 					throw new Error(`[LED] PWM ${val} out of range (0 - 128)`)
-				this.#cmd.push(`LED ${index} ${Math.round(val)}`)
+				cmd.push(`LED ${index} ${Math.round(val)}`)
 				return self
 			}
 		};
