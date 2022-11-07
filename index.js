@@ -25,32 +25,32 @@ const server = express()
 	// Remove express powered-by header
 	.disable('x-powered-by')
 	// Dynamic acquire
-	.get('/acquire', (req, res, next) => {
-		console.log('Acquisition Start');
+	.use('/acquire', (req, res, next) => {
+		const {
+			LED = 1,
+			EXP = 100,
+			DELAY = 0,
+			PWM = 1
+		} = req.query ?? {}
+		console.log('Acquire', { LED, EXP, DELAY, PWM });
+		let _unlock;
 		Lockable.getLocks(
 			controller,
 			camera
 		).then(async unlock => {
-			console.log('Acquisition Start !!!');
-			const {
-				LED = 1,
-				EXP = 100,
-				DELAY = 0,
-				PWM = 1
-			} = req.query ?? {}
-			// Start acquire
+			_unlock = unlock
+			// Load command
 			await controller
 				.WAIT(DELAY)
 				.LED(LED).PWM(PWM)
 				.WAIT(EXP)
 				.RST()
 				.commit()
-			console.log('====== COMMAND LOADED ======');
+			// Trigger the camera
 			await Promise.all([
 				controller.exec(),
 				camera.trigger()
 			]);
-			console.log('====== DONE ======');
 			// Rename the file and then release the lock
 			const path = getUniqueName(
 				uid => resolve(ENV.VAR_DATA, `${uid}.png`)
@@ -66,8 +66,12 @@ const server = express()
 			).then(unlock);
 			// Send the data
 			res.setHeader('content-type', 'image/png');
+			res.setHeader('Access-Control-Allow-Origin', '*');
 			createReadStream(path).pipe(res);
-		}).catch(next);
+		}).catch(err => {
+			try { _unlock() } catch (e) { }
+			next(err);
+		});
 	})
 	.use(express.static(ENV.WEB_STATIC_PATH))
 	.use((req, res, next) => {
