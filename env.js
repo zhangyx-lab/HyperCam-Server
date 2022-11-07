@@ -16,6 +16,13 @@ if (!existsSync(VAR)) {
 } else if (!lstatSync(VAR).isDirectory()) {
 	throw new Error(`VAR path ${VAR} has been occupied by a regular file.`);
 }
+// Initialize var data directory
+export const VAR_DATA = USER_CONF?.varDataPath ?? resolve(VAR, 'data');
+if (!existsSync(VAR_DATA)) {
+	mkdirSync(VAR_DATA);
+} else if (!lstatSync(VAR_DATA).isDirectory()) {
+	throw new Error(`VAR_DATA path ${VAR_DATA} has been occupied by a regular file.`);
+}
 // Initialize Device Info
 export const CONTROLLER_TARGET =
 	USER_CONF?.controller ?? {
@@ -35,4 +42,6 @@ if (!(typeof DRIVER_OPTIONS.serial === "string"))
 // Generate tmp picture path
 export const TMP_DATA_PATH = resolve(VAR, 'result.png');
 // Initialize Server Parameters
-export const PORT = USER_CONF?.port ?? 80;
+export const PORT = USER_CONF?.port ?? 8080;
+export const WEB_STATIC_PATH = resolve(VAR, 'web');
+export const WEB_STATIC_ENABLE = existsSync(WEB_STATIC_PATH);

@@ -9,5 +9,5 @@
 		"vendorId": "f055",
 		"productId": "0001"
 	},
-	"port": 80
+	"port": 8080
 }

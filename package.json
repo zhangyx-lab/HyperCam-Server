@@ -10,6 +10,8 @@
   "author": "Yuxuan Zhang",
   "license": "MIT",
   "dependencies": {
-    "serialport": "^10.4.0"
+    "express": "^4.18.2",
+    "serialport": "^10.4.0",
+    "uuid": "^9.0.0"
   }
 }
