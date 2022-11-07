@@ -114,7 +114,7 @@ export default class Controller extends Lockable {
 	// LED Command Parser
 	LED(index) {
 		const self = this, cmd = this.#cmd;
-		if (index < 1 || index > 8)
+		if (index < 1)
 			throw new Error(`[LED] Index ${index} out of range`);
 		return {
 			get ON() {
