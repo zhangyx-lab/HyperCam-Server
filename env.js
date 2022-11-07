@@ -26,5 +26,13 @@ export const CONTROLLER_TARGET =
 export const DRIVER_PATH = USER_CONF?.driverPath;
 if (typeof DRIVER_PATH !== 'string' || !existsSync(DRIVER_PATH))
 	throw new Error(`Invalid Camera Driver "${DRIVER_PATH}"`);
+// Initialize and check Driver Options
+export const DRIVER_OPTIONS = USER_CONF?.driverOptions;
+if (!DRIVER_OPTIONS || typeof DRIVER_OPTIONS !== 'object')
+	throw new Error(`Missing required config entry "driverOptions"`);
+if (!(typeof DRIVER_OPTIONS.serial === "string"))
+	throw new Error(`Missing required config "driverOptions.serial"`);
+// Generate tmp picture path
+export const TMP_DATA_PATH = resolve(VAR, 'result.png');
 // Initialize Server Parameters
 export const PORT = USER_CONF?.port ?? 80;
