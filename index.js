@@ -22,15 +22,20 @@ const server = express()
 			const props = await driver.trigger({ ...req.query, out });
 			// Set callback to remove tmp file
 			res.on("close", () => {
-				try {
-					unlink(out)
-				} catch (e) {
-					logger.error(e.toString())
-				}
+				unlink(out, e => { if (e) { logger.error(e.toString()) } })
 			})
 			// Send the data
 			res.setHeader('Access-Control-Allow-Origin', '*');
 			console.log(props);// TODO: ENCODE INTO HEADER
+			for (const prop of props) {
+				const [key, ...val] = prop.split("=")
+				if (!val || !val.length) {
+					logger.warn(`Unable to process property string ${prop}`);
+					continue;
+				} else {
+					res.setHeader(`cap-prop-${key.trim()}`, val.join('=').trim());
+				}
+			}
 			if (existsSync(out)) {
 				res.setHeader('content-type', 'image/png');
 				createReadStream(out).pipe(res);
@@ -57,6 +62,6 @@ await driver.lockExec();
 server.listen(PORT)
 console.log("listening", PORT)
 //random logger for testing
-setInterval(function () {
-	logger.info("New Random Number is " + parseInt(Math.random() * 1000000));
-}, 2000);
+// setInterval(function () {
+// 	logger.info("New Random Number is " + parseInt(Math.random() * 1000000));
+// }, 2000);
