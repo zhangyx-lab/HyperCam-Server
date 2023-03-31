@@ -15,5 +15,5 @@ export function getUniqueName(
 		const path = getPath(getUid());
 		if (!existsSync(path)) return path;
 	}
-	throw new Error('Unable to generate unique file name')
+	throw new Error('Unable to generate unique name: max attempts exceeded')
 }
