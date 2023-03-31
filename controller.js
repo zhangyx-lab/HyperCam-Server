@@ -114,7 +114,7 @@ export default class Controller extends Lockable {
 	// LED Command Parser
 	LED(index) {
 		const self = this, cmd = this.#cmd;
-		if (index < 1)
+		if (index < 1 || index > 8)
 			throw new Error(`[LED] Index ${index} out of range`);
 		return {
 			get ON() {
@@ -126,8 +126,8 @@ export default class Controller extends Lockable {
 				return self
 			},
 			PWM(val) {
-				if (val < 0 || val > 128)
-					throw new Error(`[LED] PWM ${val} out of range (0 - 128)`)
+				if (val < 0)
+					throw new Error(`[LED] PWM ${val} out of range (0 - 256)`)
 				cmd.push(`LED ${index} ${Math.round(val)}`)
 				return self
 			}
