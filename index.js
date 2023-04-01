@@ -17,7 +17,12 @@ const server = express()
 	// Remove express powered-by header
 	.disable('x-powered-by')
 	// Remote restart
-	.use('/restart', (req, res, next) => {
+	.use('/restart-server', (req, res, next) => {
+		logger.info(`Driver restart demanded by ${req.headers['X-Real-IP'] ?? req.src}`);
+		driver.restart().catch(next);
+	})
+	// Remote restart
+	.use('/restart-server', (req, res, next) => {
 		logger.info(`Restart demanded by ${req.headers['X-Real-IP'] ?? req.src}`);
 		process.exit(0);
 	})
