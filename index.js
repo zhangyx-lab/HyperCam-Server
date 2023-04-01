@@ -32,14 +32,14 @@ const server = express()
 	})
 	// Dynamic acquire
 	.use('/capture', (req, res, next) => {
-		// logger.info('Acquire', { LED, EXP, DELAY, PWM });
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		// Lock the driver for capturing
 		driver.lockExec(async () => {
 			// Rename the file and then release the lock
 			const
 				out = getUniqueName(s => resolve(TMP, `${s}.png`)),
 				props = await driver.trigger({ ...req.query, out });
 			// Send the data
-			res.setHeader('Access-Control-Allow-Origin', '*');
 			for (const prop of props.stack) {
 				const [key, ...val] = prop.split("=")
 				if (!val || !val.length) {
