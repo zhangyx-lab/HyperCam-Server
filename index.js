@@ -71,7 +71,8 @@ const server = express()
 	.use(express.static(WEB_STATIC_PATH))
 	.use((req, res, next) => res.redirect('/'))
 	.use((err, req, res, next) => {
-		logger.error("server error: " + err.toString());
+		logger.error(err.toString());
+		if (err?.stack) logger.info(err.stack.toString());
 		try { res.sendStatus(500); } catch (e) { }
 	});
 // Configure timeout to 1 hour
