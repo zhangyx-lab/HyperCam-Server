@@ -37,10 +37,10 @@ export function toAsync(fn) {
  */
 export function realIP(request) {
 	return (
-		request.headers['X-Real-IP'] ??
-		request.headers['x-real-ip'] ??
 		request.headers['x-forwarded-for'] ??
 		request.headers['X-Forwarded-For'] ??
+		request.headers['x-real-ip'] ??
+		request.headers['X-Real-IP'] ??
 		request.socket.remoteAddress
 	)
 }

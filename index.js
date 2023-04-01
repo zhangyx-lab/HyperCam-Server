@@ -16,9 +16,13 @@ const driver = new Driver(DRIVER_PATH);
 const server = express()
 	// Remove express powered-by header
 	.disable('x-powered-by')
+	.use((req, res, next) => {
+		logger.verbose(req.url);
+		next();
+	})
 	// Remote restart
 	.use('/restart-driver', (req, res, next) => {
-		logger.info(`Driver restart demanded by ${realIP(req)}`);
+		logger.warn(`Driver restart demanded by ${realIP(req)}`);
 		driver
 			.restart()
 			.then(() => res.status(200).send('success'))
@@ -26,7 +30,7 @@ const server = express()
 	})
 	// Remote restart
 	.use('/restart-server', (req, res, next) => {
-		logger.info(`Server Restart demanded by ${realIP(req)}`);
+		logger.warn(`Server Restart demanded by ${realIP(req)}`);
 		res.status(200).send('success');
 		process.exit(0);
 	})
