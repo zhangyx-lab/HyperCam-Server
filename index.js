@@ -40,7 +40,6 @@ const server = express()
 				out = getUniqueName(s => resolve(TMP, `${s}.png`)),
 				props = await driver.trigger({ ...req.query, out });
 			// Send the data
-			console.log(props)
 			for (const prop of props.stack) {
 				const [key, ...val] = prop.split("=")
 				if (!val || !val.length) {
