@@ -1,6 +1,6 @@
 // Internal library
 import { createReadStream, existsSync, unlink } from 'fs';
-import { getUniqueName, toAsync } from './util/util.js';
+import { getUniqueName, toAsync, realIP } from './util/util.js';
 import { resolve } from 'path';
 // NPM Package
 import express from 'express';
@@ -17,13 +17,13 @@ const server = express()
 	// Remove express powered-by header
 	.disable('x-powered-by')
 	// Remote restart
-	.use('/restart-server', (req, res, next) => {
-		logger.info(`Driver restart demanded by ${req.headers['X-Real-IP'] ?? req.src}`);
+	.use('/restart-driver', (req, res, next) => {
+		logger.info(`Driver restart demanded by ${realIP(req)}`);
 		driver.restart().catch(next);
 	})
 	// Remote restart
 	.use('/restart-server', (req, res, next) => {
-		logger.info(`Restart demanded by ${req.headers['X-Real-IP'] ?? req.src}`);
+		logger.info(`Server Restart demanded by ${realIP(req)}`);
 		process.exit(0);
 	})
 	// Dynamic acquire
