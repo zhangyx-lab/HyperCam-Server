@@ -19,11 +19,12 @@ const server = express()
 	// Remote restart
 	.use('/restart-driver', (req, res, next) => {
 		logger.info(`Driver restart demanded by ${realIP(req)}`);
-		driver.restart().catch(next);
+		driver.restart().then(() => res.sendStatus(200)).catch(next);
 	})
 	// Remote restart
 	.use('/restart-server', (req, res, next) => {
 		logger.info(`Server Restart demanded by ${realIP(req)}`);
+		res.sendStatus(200);
 		process.exit(0);
 	})
 	// Dynamic acquire
