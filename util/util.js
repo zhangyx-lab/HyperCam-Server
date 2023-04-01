@@ -17,3 +17,30 @@ export function getUniqueName(
 	}
 	throw new Error('Unable to generate unique name: max attempts exceeded')
 }
+/**
+ * Wraps functions with callback with Promise
+ * @param {(Function<Error>)=>{Promise}} fn 
+ * @returns {Promise}
+ */
+export function toAsync(fn) {
+	return new Promise((res, rej) => {
+		function handler(err) {
+			if (err) rej(err)
+			else res()
+		}
+		fn(handler);
+	})
+}
+/**
+ * Checks for real IP of the remote client
+ * 
+ */
+export function realIP(request) {
+	return (
+		request.headers['X-Real-IP'] ??
+		request.headers['x-real-ip'] ??
+		request.headers['x-forwarded-for'] ??
+		request.headers['X-Forwarded-For'] ??
+		request.socket.remoteAddress
+	)
+}

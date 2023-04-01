@@ -1,27 +1,76 @@
 import { createLogger, format, transports } from 'winston';
-export { WSTransport } from 'winston-websocket';
+import { LOG_FILE_STREAM } from './env.js';
+import color from 'colors/safe.js';
 
-export const logger = createLogger({
-	format: format.json(),
-	level: ['verbose'],
+const
+	levels = {
+		verbose: 0,
+		info: 1,
+		warn: 2,
+		error: 3,
+		panic: 4
+	},
+	levelScheme = {
+		verbose: s => color.italic(color.green(s)),
+		info: color.cyan,
+		warn: color.yellow,
+		error: color.red,
+		panic: s => color.bold((color.underline(color.red(s))))
+	},
+	levelNames = {
+		verbose: ':verbose',
+		info   : ':info   ',
+		warn   : ':warn   ',
+		error  : ':error  ',
+		panic  : ':panic  '
+	};
+
+const colorize = process.stdout.isTTY
+	? ({ timestamp = '', src = 'server', level, message, ...info }) => {
+		const
+			_scheme = levelScheme[level] ?? (s => s.toString()),
+			scheme = src == 'driver'
+				? s => color.dim(_scheme(s))
+				: _scheme;
+		return {
+			timestamp: color.dim(timestamp.toString()),
+			src: scheme(src),
+			level: scheme(levelNames[level] ?? `:${level}`),
+			message: scheme(message),
+			...info
+		}
+	}
+	: ({level, ...info}) => ({level: `:${level}`, ...info})
+
+const consoleFormatter = format.combine(
+	format.timestamp({
+		format: "YYYY-MM-DD HH:mm:ss"
+	}),
+	{ transform: colorize },
+	format.printf(
+		({ timestamp, level, message, src = 'server' }) => `${timestamp} ${src}${level} ${message}`
+	)
+);
+
+const fileStreamFormatter = format.combine(
+	format.timestamp({
+		format: "YYYY-MM-DD HH:mm:ss"
+	}),
+	format.printf(
+		({ timestamp, level, message, src = 'server' }) => `${timestamp} [${src}:${level}] ${message}`
+	)
+);
+
+export default createLogger({
+	level: 0,
+	levels,
 	transports: [
-		new transports.Console()
+		new transports.Console({
+			format: consoleFormatter
+		}),
+		new transports.Stream({
+			stream: LOG_FILE_STREAM,
+			format: fileStreamFormatter
+		})
 	]
 })
-
-const InfoRx = () => /^#\W?/g
-let messageBuffer = ""
-
-export function handleMessage(msg) {
-	messageBuffer += msg.toString()
-	while (true) {
-		const index = messageBuffer.indexOf("\n");
-		if (index < 0) break;
-		const line = messageBuffer.slice(0, index)
-		messageBuffer = messageBuffer.slice(index + 1)
-		if (InfoRx().test(line))
-			logger.info(line.replace(InfoRx(), '').trim())
-		else
-			logger.error(line.trim())
-	}
-}
