@@ -13,10 +13,23 @@ import Driver from './lib/Driver.js';
 logger.info(`Server started as PID<${process.pid}>`);
 // Initialize driver
 const driver = new Driver(DRIVER_PATH);
+// Initialize websocket Server
+const wsServer = new WebSocketServer({ noServer: true });
+wsServer.on('connection', (socket, request) => {
+	websocketTransport.register(socket);
+	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
+});
 // Create server
 const server = express()
 	// Remove express powered-by header
 	.disable('x-powered-by')
+	// Handle websocket upgrades
+	.on('upgrade', (req, socket, head) => {
+		wsServer.handleUpgrade(
+			req, socket, head,
+			(ws, req) => ws.emit('connection', ws, req)
+		)
+	})
 	.use((req, res, next) => {
 		res.setHeader('Access-Control-Allow-Origin', '*');
 		logger.verbose(req.url);
@@ -93,15 +106,6 @@ const server = express()
 			logger.verbose(`Error terminating response during error handling: ${e}`);
 		}
 	});
-// Initialize websocket connection
-const wsServer = new WebSocketServer({ noServer: true });
-wsServer.on('connection', (socket, request) => {
-	websocketTransport.register(socket);
-	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
-});
-server.on('upgrade', (req, socket, head) => {
-	wsServer.handleUpgrade(req, socket, head, (ws, req) => ws.emit('connection'))
-})
 //start server
 server.listen(PORT, () => logger.info(`Server set up on port <${PORT}>`))
 // Capture SIGINT
