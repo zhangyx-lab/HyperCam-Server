@@ -81,7 +81,14 @@ const server = express()
 	.use((err, req, res, next) => {
 		logger.error(err.toString());
 		if (err?.stack) logger.info(err.stack.toString());
-		try { res.status(500).send(err.toString()); } catch (e) { }
+		try {
+			res
+				.setHeader('Content-Type', 'text/plain')
+				.status(500)
+				.send(err.toString());
+		} catch (e) {
+			logger.verbose(`Error terminating response during error handling: ${e}`);
+		}
 	});
 // Configure timeout to 1 hour
 server.on('connection', socket => socket.setTimeout(60 * 60 * 1000));
