@@ -81,7 +81,7 @@ const server = express()
 	.use((err, req, res, next) => {
 		logger.error(err.toString());
 		if (err?.stack) logger.info(err.stack.toString());
-		try { res.sendStatus(500); } catch (e) { }
+		try { res.status(500).send(err.toString()); } catch (e) { }
 	});
 // Configure timeout to 1 hour
 server.on('connection', socket => socket.setTimeout(60 * 60 * 1000));
