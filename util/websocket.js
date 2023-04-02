@@ -37,4 +37,4 @@ class WebsocketTransport extends TransportStream {
 	}
 }
 
-export default new WebsocketTransport();
+export default WebsocketTransport;
