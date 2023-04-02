@@ -13,8 +13,18 @@ import Driver from './lib/Driver.js';
 logger.info(`Server started as PID<${process.pid}>`);
 // Initialize driver
 const driver = new Driver(DRIVER_PATH);
-// Create server
-const server = express()
+const
+	// Create server
+	server = express(),
+	// Initialize websocket connection
+	wsServer = new WebSocketServer({ server });
+// Redirect websocket connections
+wsServer.on('connection', (socket, request) => {
+	websocketTransport.register(socket);
+	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
+});
+// Configure server
+server
 	// Remove express powered-by header
 	.disable('x-powered-by')
 	.use((req, res, next) => {
@@ -93,24 +103,6 @@ const server = express()
 	});
 // Configure timeout to 1 hour
 server.on('connection', socket => socket.setTimeout(60 * 60 * 1000));
-// Initialize websocket connection
-const wsServer = new WebSocketServer({ noServer: true });
-wsServer.on('connection', (socket, request) => {
-	websocketTransport.register(socket);
-	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
-});
-server.on('upgrade', (request, socket, head) => {
-	const { url } = request;
-	if (url === '/log') {
-		wsServer.handleUpgrade(
-			request, socket, head,
-			socket => wsServer.emit('connection', socket, request)
-		);
-	} else {
-		logger.warn()
-		socket.destroy();
-	}
-})
 //start server
 server.listen(PORT, () => logger.info(`Server set up on port <${PORT}>`))
 // Capture SIGINT
