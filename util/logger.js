@@ -62,7 +62,11 @@ const fileStreamFormatter = format.combine(
 	)
 );
 
-export const websocketTransport = new WebsocketTransport();
+export const websocketTransport = new WebsocketTransport({
+	format: format.timestamp({
+		format: "YYYY-MM-DD HH:mm:ss"
+	})
+});
 
 export default createLogger({
 	level: 0,
