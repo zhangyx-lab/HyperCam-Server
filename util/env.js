@@ -52,6 +52,8 @@ if (fs.existsSync(LOG_FILE_PATH)) {
 export const LOG_FILE_STREAM = fs.createWriteStream(LOG_FILE_PATH, { flags: 'a' });
 // Create symlink from var/server.log to active log file
 const LOG_SYMLINK = resolve(VAR, "server.log");
-if (fs.existsSync(LOG_SYMLINK) && fs.lstatSync(LOG_SYMLINK).isSymbolicLink())
+try {
 	fs.unlinkSync(LOG_SYMLINK);
-fs.symlinkSync(LOG_FILE_PATH, LOG_SYMLINK, 'file');
+} finally {
+	fs.symlinkSync(LOG_FILE_PATH, LOG_SYMLINK, 'file');
+}
