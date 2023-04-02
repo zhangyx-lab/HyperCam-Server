@@ -38,6 +38,8 @@ const server = express()
 	})
 	// Dynamic acquire
 	.use('/capture', (req, res, next) => {
+		// Configure timeout to 1 hour
+		req.setTimeout(60 * 60_000);
 		// Lock the driver for capturing
 		driver.lockExec(async function Capture() {
 			// Rename the file and then release the lock
@@ -91,8 +93,6 @@ const server = express()
 			logger.verbose(`Error terminating response during error handling: ${e}`);
 		}
 	});
-// Configure timeout to 1 hour
-server.on('connection', socket => socket.setTimeout(60 * 60 * 1000));
 // Initialize websocket connection
 const wsServer = new WebSocketServer({ noServer: true });
 wsServer.on('connection', (socket, request) => {
