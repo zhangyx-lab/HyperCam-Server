@@ -6,7 +6,7 @@ import express from "express";
 // Project Libraries
 import { WEB_STATIC_PATH } from './env.js';
 import logger from './logger.js';
-import capture from './capture.js';
+import capture, { driver } from './capture.js';
 // Export express server instance
 export default express()
 	// Remove express powered-by header
