@@ -17,7 +17,7 @@ class WebsocketTransport extends TransportStream {
 		// Send to all listeners
 		for (const ws of this.#wsList) {
 			try {
-				ws.send(JSON.stringify(info) + '\n');
+				ws.send(JSON.stringify({src: 'server', ...info}) + '\n');
 			} catch (e) {
 				console.error(`Error logging to websocket: ${e}`);
 			}
