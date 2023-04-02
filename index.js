@@ -38,7 +38,7 @@ const server = express()
 	// Dynamic acquire
 	.use('/capture', (req, res, next) => {
 		// Lock the driver for capturing
-		driver.lockExec(async () => {
+		driver.lockExec(async function Capture() {
 			// Rename the file and then release the lock
 			const
 				out = getUniqueName(s => resolve(TMP, `${s}.png`)),
