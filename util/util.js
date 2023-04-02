@@ -41,6 +41,7 @@ export function realIP(request) {
 		request.headers['X-Forwarded-For'] ??
 		request.headers['x-real-ip'] ??
 		request.headers['X-Real-IP'] ??
+		request.remoteAddress ??
 		request.socket.remoteAddress
 	)
 }
