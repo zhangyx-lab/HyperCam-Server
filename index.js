@@ -17,6 +17,7 @@ const server = express()
 	// Remove express powered-by header
 	.disable('x-powered-by')
 	.use((req, res, next) => {
+		res.setHeader('Access-Control-Allow-Origin', '*');
 		logger.verbose(req.url);
 		next();
 	})
@@ -36,7 +37,6 @@ const server = express()
 	})
 	// Dynamic acquire
 	.use('/capture', (req, res, next) => {
-		res.setHeader('Access-Control-Allow-Origin', '*');
 		// Lock the driver for capturing
 		driver.lockExec(async () => {
 			// Rename the file and then release the lock
