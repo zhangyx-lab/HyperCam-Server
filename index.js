@@ -13,21 +13,12 @@ import Driver from './lib/Driver.js';
 logger.info(`Server started as PID<${process.pid}>`);
 // Initialize driver
 const driver = new Driver(DRIVER_PATH);
-const
-	// Create server
-	server = express(),
-	// Initialize websocket connection
-	wsServer = new WebSocketServer({ server });
-// Redirect websocket connections
-wsServer.on('connection', (socket, request) => {
-	websocketTransport.register(socket);
-	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
-});
-// Configure server
-server
+// Create server
+const server = express()
 	// Remove express powered-by header
 	.disable('x-powered-by')
 	.use((req, res, next) => {
+		console.log(req.headers)
 		res.setHeader('Access-Control-Allow-Origin', '*');
 		logger.verbose(req.url);
 		next();
@@ -103,6 +94,12 @@ server
 	});
 // Configure timeout to 1 hour
 server.on('connection', socket => socket.setTimeout(60 * 60 * 1000));
+// Initialize websocket connection
+const wsServer = new WebSocketServer({ server });
+wsServer.on('connection', (socket, request) => {
+	websocketTransport.register(socket);
+	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
+});
 //start server
 server.listen(PORT, () => logger.info(`Server set up on port <${PORT}>`))
 // Capture SIGINT
