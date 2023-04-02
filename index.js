@@ -94,11 +94,23 @@ const server = express()
 // Configure timeout to 1 hour
 server.on('connection', socket => socket.setTimeout(60 * 60 * 1000));
 // Initialize websocket connection
-const wsServer = new WebSocketServer({ server });
+const wsServer = new WebSocketServer({ noServer: true });
 wsServer.on('connection', (socket, request) => {
 	websocketTransport.register(socket);
 	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
 });
+server.on('upgrade', (request, socket, head) => {
+	const { url } = request;
+	if (url === '/log') {
+		wsServer.handleUpgrade(
+			request, socket, head,
+			socket => wsServer.emit('connection', socket, request)
+		);
+	} else {
+		logger.warn()
+		socket.destroy();
+	}
+})
 //start server
 server.listen(PORT, () => logger.info(`Server set up on port <${PORT}>`))
 // Capture SIGINT
