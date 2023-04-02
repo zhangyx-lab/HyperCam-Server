@@ -7,7 +7,7 @@ import { TMP, DRIVER_PATH } from './env.js';
 import logger from './logger.js';
 import Driver from '../lib/Driver.js';
 // Initialize driver
-// const driver = new Driver(DRIVER_PATH);
+const driver = new Driver(DRIVER_PATH);
 // Export capture request handler
 export default function capture(req, res, next) {
 	// Configure timeout to 1 hour

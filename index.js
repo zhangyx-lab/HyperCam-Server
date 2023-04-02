@@ -13,8 +13,6 @@ logger.info(`Server launched with PID ${process.pid}`);
 const wsServer = new WebSocketServer({ noServer: true });
 // configure websocket server
 wsServer.on('connection', (socket, request) => {
-	console.log(request.constructor.name, Object.keys(request))
-	console.log(socket.constructor.name, Object.keys(socket))
 	websocketTransport.register(socket);
 	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
 });
