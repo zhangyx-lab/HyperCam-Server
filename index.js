@@ -4,9 +4,10 @@ import { getUniqueName, toAsync, realIP } from './util/util.js';
 import { resolve } from 'path';
 // NPM Package
 import express from 'express';
+import { WebSocketServer } from 'ws';
 // Project dependencies
 import { PORT, TMP, DRIVER_PATH, WEB_STATIC_PATH } from './util/env.js';
-import logger from './util/logger.js'
+import logger, { websocketTransport } from './util/logger.js'
 import Driver from './lib/Driver.js';
 // Log current PID
 logger.info(`Server started as PID<${process.pid}>`);
@@ -92,6 +93,12 @@ const server = express()
 	});
 // Configure timeout to 1 hour
 server.on('connection', socket => socket.setTimeout(60 * 60 * 1000));
+// Initialize websocket connection
+const wsServer = new WebSocketServer({ server });
+wsServer.on('connection', (socket, request) => {
+	websocketTransport.register(socket);
+	logger.info(`Websocket ${request.url} connected from ${realIP(request)}`);
+});
 //start server
 server.listen(PORT, () => logger.info(`Server set up on port <${PORT}>`))
 // Capture SIGINT

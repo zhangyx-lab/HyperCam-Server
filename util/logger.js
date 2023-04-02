@@ -1,6 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 import { LOG_FILE_STREAM } from './env.js';
 import color from 'colors/safe.js';
+import WebsocketTransport from './websocket.js';
 
 const
 	levels = {
@@ -61,6 +62,8 @@ const fileStreamFormatter = format.combine(
 	)
 );
 
+export const websocketTransport = new WebsocketTransport();
+
 export default createLogger({
 	level: 0,
 	levels,
@@ -71,6 +74,7 @@ export default createLogger({
 		new transports.Stream({
 			stream: LOG_FILE_STREAM,
 			format: fileStreamFormatter
-		})
+		}),
+		websocketTransport
 	]
 })
