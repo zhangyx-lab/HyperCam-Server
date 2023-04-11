@@ -17,7 +17,7 @@ export default function capture(req, res, next) {
 		// Rename the file and then release the lock
 		const
 			out = getUniqueName(s => resolve(TMP, `${s}.png`)),
-			props = await driver.trigger({ ...req.query, out });
+			props = await driver.trigger({ ...(req?.query ?? {}), out });
 		// Send the data
 		for (const prop of props.stack) {
 			const [key, ...val] = prop.split("=")
